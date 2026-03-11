@@ -1,83 +1,57 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Navbar } from './components/layout/Navbar';
-import { HomePage } from './pages/HomePage';
-import { ListingsPage } from './pages/ListingsPage';
-import { PropertyDetailPage } from './pages/PropertyDetailPage';
-import { AgentsPage } from './pages/AgentsPage';
-import { NeighborhoodsPage } from './pages/NeighborhoodsPage';
+import React, { useState } from 'react';
+import { Header } from './components/Header';
+import { Hero } from './components/Hero';
+import { Properties } from './components/Properties';
+import { MarketTrends } from './components/MarketTrends';
+import { Neighborhoods } from './components/Neighborhoods';
+import { MortgageCalculator } from './components/MortgageCalculator';
+import { Agents } from './components/Agents';
+import { PropertyMap } from './components/PropertyMap';
+import { Footer } from './components/Footer';
 import { Toaster } from 'sonner';
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-slate-50 selection:bg-blue-100 selection:text-blue-600">
-        <Navbar />
-        <main>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/listings" element={<ListingsPage />} />
-            <Route path="/properties/:id" element={<PropertyDetailPage />} />
-            <Route path="/agents" element={<AgentsPage />} />
-            <Route path="/neighborhoods" element={<NeighborhoodsPage />} />
-          </Routes>
-        </main>
+    <div className="min-h-screen bg-white selection:bg-blue-100 selection:text-blue-900">
+      <Toaster position="top-center" expand={true} richColors />
+      <Header />
+      <main className="overflow-x-hidden">
+        <Hero />
+        <Properties />
+        <PropertyMap />
+        <MarketTrends />
+        <Neighborhoods />
+        <MortgageCalculator />
+        <Agents />
         
-        <footer className="bg-slate-900 text-white py-20 mt-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-              <div className="col-span-1 md:col-span-2">
-                <div className="flex items-center gap-2 mb-6">
-                  <img src="https://storage.googleapis.com/dala-prod-public-storage/attachments/11007e86-66bf-437e-969a-429a955a44b0/1773259194029_IMG_20251224_004455_653.jpg" className="h-10 rounded shadow-lg" alt="Logo" />
-                  <span className="text-2xl font-black tracking-tight">EGEREE CONSTRUCTION</span>
+        {/* Testimonials Section */}
+        <section className="py-24 bg-blue-600 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+          <div className="max-w-7xl mx-auto px-4 text-center relative z-10">
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-16 tracking-tight">What Our Clients Say</h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                { name: 'David Chen', text: 'Egeree Construction delivered our dream home with precision. Their attention to detail is unmatched.', company: 'Tech CEO' },
+                { name: 'Sarah Jenkins', text: 'The 3D virtual tours made our decision so much easier. Transparent and professional throughout.', company: 'Real Estate Investor' },
+                { name: 'Michael Ross', text: 'Their market data tool helped us time our investment perfectly. Highly recommended team.', company: 'Financial Advisor' }
+              ].map((t, i) => (
+                <div key={i} className="bg-white/10 backdrop-blur-md p-10 rounded-[3rem] border border-white/10 text-left hover:bg-white/15 transition-all">
+                  <div className="flex gap-1 mb-6">
+                    {[1,2,3,4,5].map(s => <span key={s} className="text-yellow-400">★</span>)}
+                  </div>
+                  <p className="text-white text-lg font-medium italic mb-8">"{t.text}"</p>
+                  <div>
+                    <h4 className="text-white font-black">{t.name}</h4>
+                    <p className="text-blue-200 text-sm font-bold uppercase tracking-wider">{t.company}</p>
+                  </div>
                 </div>
-                <p className="text-slate-400 max-w-sm mb-8 leading-relaxed">
-                  Redefining luxury through architectural mastery and unparalleled engineering. From conception to completion, we build the spaces where legends live.
-                </p>
-                <div className="flex gap-4">
-                  {['Twitter', 'Instagram', 'LinkedIn', 'YouTube'].map(social => (
-                    <a key={social} href="#" className="text-slate-500 hover:text-white transition-colors text-sm font-bold uppercase tracking-widest">{social}</a>
-                  ))}
-                </div>
-              </div>
-              
-              <div>
-                <h4 className="font-bold text-lg mb-6">Quick Links</h4>
-                <ul className="space-y-4 text-slate-400">
-                  <li><Link to="/listings" className="hover:text-blue-400">View Listings</Link></li>
-                  <li><Link to="/agents" className="hover:text-blue-400">Our Agents</Link></li>
-                  <li><Link to="/neighborhoods" className="hover:text-blue-400">Market Guide</Link></li>
-                  <li><a href="#" className="hover:text-blue-400 font-bold text-blue-400">Build With Us</a></li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="font-bold text-lg mb-6">Offices</h4>
-                <ul className="space-y-4 text-slate-400 text-sm">
-                  <li>
-                    <strong className="text-white block">Los Angeles HQ</strong>
-                    123 Sunset Blvd, CA 90210
-                  </li>
-                  <li>
-                    <strong className="text-white block">New York Studio</strong>
-                    456 5th Avenue, NY 10001
-                  </li>
-                </ul>
-              </div>
-            </div>
-            
-            <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-xs font-bold uppercase tracking-widest">
-              <div>© 2024 EGEREE CONSTRUCTION. All Rights Reserved.</div>
-              <div className="flex gap-8">
-                <a href="#" className="hover:text-white">Privacy Policy</a>
-                <a href="#" className="hover:text-white">Terms of Service</a>
-              </div>
+              ))}
             </div>
           </div>
-        </footer>
-        <Toaster position="bottom-right" richColors />
-      </div>
-    </Router>
+        </section>
+      </main>
+      <Footer />
+    </div>
   );
 }
 

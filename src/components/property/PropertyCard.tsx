@@ -1,113 +1,95 @@
 import React, { useState } from 'react';
-import { 
-  Bed, 
-  Bath, 
-  Square, 
-  MapPin, 
-  ArrowRight, 
-  Heart, 
-  Expand, 
-  CheckCircle2 
-} from 'lucide-react';
 import { Property } from '../../types';
-import { formatCurrency, cn } from '../../lib/utils';
-import { Button } from '../ui/button';
-import { Link } from 'react-router-dom';
+import { Bed, Bath, Maximize2, MapPin, Heart, ArrowRightLeft } from 'lucide-react';
+import { Card, CardContent } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { motion } from 'framer-motion';
+import { toast } from 'sonner';
 
 interface PropertyCardProps {
   property: Property;
-  onCompareToggle?: (id: string) => void;
+  onView?: (id: string) => void;
+  onCompare?: (property: Property) => void;
   isComparing?: boolean;
 }
 
-export function PropertyCard({ property, onCompareToggle, isComparing }: PropertyCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
+export const PropertyCard: React.FC<PropertyCardProps> = ({ property, onView, onCompare, isComparing = false }) => {
+  const [isLiked, setIsLiked] = useState(false);
+
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsLiked(!isLiked);
+    toast.info(isLiked ? "Removed from favorites" : "Added to favorites");
+  };
+
+  const handleCompare = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onCompare) onCompare(property);
+  };
+
+  const handleView = () => {
+    if (onView) onView(property.id);
+  };
 
   return (
-    <div 
-      className="group relative bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="group cursor-pointer"
+      onClick={handleView}
     >
-      <div className="relative aspect-[4/3] overflow-hidden">
-        <img 
-          src={property.imageUrl} 
-          alt={property.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-        />
-        <div className="absolute top-4 left-4 flex gap-2">
-          <span className="px-3 py-1 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-bold uppercase tracking-wider text-slate-900 shadow-sm">
-            {property.status}
-          </span>
-          <span className="px-3 py-1 bg-blue-600 rounded-full text-[10px] font-bold uppercase tracking-wider text-white shadow-sm">
-            {property.type}
-          </span>
-        </div>
-        <button className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-md rounded-full text-slate-400 hover:text-red-500 transition-colors shadow-sm">
-          <Heart className="h-4 w-4" />
-        </button>
-        
-        {/* Overlay Action */}
-        <div className={cn(
-          "absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent transition-opacity duration-300",
-          isHovered ? "opacity-100" : "opacity-0"
-        )}>
-          <Link to={`/properties/${property.id}`}>
-            <Button size="sm" className="w-full bg-white text-slate-900 hover:bg-slate-100 font-bold">
-              View Details
-            </Button>
-          </Link>
-        </div>
-      </div>
-
-      <div className="p-5">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-lg font-bold text-slate-900 line-clamp-1">{property.title}</h3>
-          <span className="text-lg font-bold text-blue-600">{formatCurrency(property.price)}</span>
-        </div>
-        
-        <div className="flex items-center text-slate-500 text-sm mb-4">
-          <MapPin className="h-3.5 w-3.5 mr-1" />
-          <span className="truncate">{property.location}</span>
-        </div>
-
-        <div className="grid grid-cols-3 gap-4 py-4 border-t border-slate-100">
-          <div className="flex flex-col items-center gap-1">
-            <div className="flex items-center text-slate-900 font-bold text-sm">
-              <Bed className="h-4 w-4 mr-1 text-slate-400" /> {property.bedrooms}
-            </div>
-            <span className="text-[10px] uppercase text-slate-400 font-medium">Beds</span>
+      <Card className="overflow-hidden border-none shadow-md hover:shadow-xl transition-all duration-300 rounded-[2.5rem] bg-white border border-gray-50">
+        <div className="relative h-72 overflow-hidden rounded-[2.2rem] m-2">
+          <img 
+            src={property.imageUrl} 
+            alt={property.title}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          />
+          <div className="absolute top-4 left-4 flex gap-2">
+            <Badge className="bg-white/90 text-blue-600 px-4 py-2 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl backdrop-blur-md border-none">
+              {property.type}
+            </Badge>
           </div>
-          <div className="flex flex-col items-center gap-1">
-            <div className="flex items-center text-slate-900 font-bold text-sm">
-              <Bath className="h-4 w-4 mr-1 text-slate-400" /> {property.bathrooms}
-            </div>
-            <span className="text-[10px] uppercase text-slate-400 font-medium">Baths</span>
-          </div>
-          <div className="flex flex-col items-center gap-1">
-            <div className="flex items-center text-slate-900 font-bold text-sm">
-              <Square className="h-4 w-4 mr-1 text-slate-400" /> {property.sqft}
-            </div>
-            <span className="text-[10px] uppercase text-slate-400 font-medium">Sqft</span>
-          </div>
-        </div>
-
-        <div className="mt-4 flex items-center justify-between">
-          <button 
-            onClick={() => onCompareToggle?.(property.id)}
-            className={cn(
-              "text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors",
-              isComparing ? "text-blue-600" : "text-slate-400 hover:text-slate-600"
+          <div className="absolute top-4 right-4 flex flex-col gap-2">
+            <button 
+              onClick={handleLike}
+              className={`p-3 rounded-2xl backdrop-blur-md transition-all hover:scale-110 ${isLiked ? 'bg-red-500 text-white' : 'bg-white/30 text-white hover:bg-white/50'}`}
+            >
+              <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
+            </button>
+            {onCompare && (
+              <button 
+                onClick={handleCompare}
+                className={`p-3 rounded-2xl backdrop-blur-md transition-all hover:scale-110 ${isComparing ? 'bg-blue-600 text-white' : 'bg-white/30 text-white hover:bg-white/50'}`}
+              >
+                <ArrowRightLeft className="w-4 h-4" />
+              </button>
             )}
-          >
-            {isComparing ? <CheckCircle2 className="h-4 w-4" /> : <Expand className="h-4 w-4" />}
-            {isComparing ? 'Added to Compare' : 'Compare'}
-          </button>
-          <Link to={`/properties/${property.id}`} className="text-blue-600 hover:text-blue-700">
-            <ArrowRight className="h-5 w-5" />
-          </Link>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-black/80 via-black/20 to-transparent">
+            <div className="text-white text-3xl font-black tracking-tighter">
+              ${property.price.toLocaleString()}
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+        <CardContent className="p-8 pt-4">
+          <h3 className="text-2xl font-black text-gray-900 mb-2 truncate tracking-tight">{property.title}</h3>
+          <div className="flex items-center text-gray-400 font-bold text-sm mb-6">
+            <MapPin className="w-4 h-4 mr-2 text-blue-500" />
+            {property.location}
+          </div>
+          <div className="flex justify-between items-center pt-6 border-t border-gray-50">
+            <div className="flex items-center gap-6 text-gray-900 font-black text-xs uppercase tracking-widest">
+              <span className="flex items-center"><Bed className="w-4 h-4 mr-2 text-blue-500" /> {property.bedrooms}</span>
+              <span className="flex items-center"><Bath className="w-4 h-4 mr-2 text-blue-500" /> {property.bathrooms}</span>
+              <span className="flex items-center"><Maximize2 className="w-4 h-4 mr-2 text-blue-500" /> {property.sqft}</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
-}
+};
+
+export default PropertyCard;
